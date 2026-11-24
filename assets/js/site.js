@@ -131,7 +131,7 @@
 
   /* ---------- no animation fallback ---------- */
   var loader = d.querySelector('.loader');
-  if (!hasGsap || reduce) {
+  if (!hasGsap) {
     if (loader) loader.remove();
     root.classList.remove('js');
     window.addEventListener('resize', function () { measure(); drawEmblem(); });
@@ -170,6 +170,17 @@
   gsap.set('.hero .h-eb, .hero .h-fade', { autoAlpha: 0, y: 24 });
   gsap.set('.hero-emblem', { autoAlpha: 0 });
   gsap.set('.hero .bg-base img', { scale: 1.12 });
+
+  /* safety net: never leave the visitor behind the loader */
+  setTimeout(function () {
+    if (loader && loader.style.display !== 'none') {
+      loader.style.display = 'none';
+      gsap.set('.hero .line>span', { yPercent: 0 });
+      gsap.set('.hero .h-eb, .hero .h-fade, .hero-emblem', { autoAlpha: 1, y: 0 });
+      gsap.set('.hero .bg-base img', { scale: 1 });
+      if (lenis) lenis.start();
+    }
+  }, 9000);
 
   /* ---------- loader → intro ---------- */
   var ready = Promise.all([
